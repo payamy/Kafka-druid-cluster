@@ -1,0 +1,153 @@
+version: '3.2'
+
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    ports:
+      - 9870:9870
+      - 9000:9000
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=kafka-druid-cluster
+    env_file:
+      - ./hdfs_conf/hadoop.env
+
+  datanode-1:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    volumes:
+      - hadoop_datanode_1:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hdfs_conf/hadoop.env
+
+  datanode-2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    volumes:
+      - hadoop_datanode_2:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hdfs_conf/hadoop.env
+
+  datanode-3:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    volumes:
+      - hadoop_datanode_3:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hdfs_conf/hadoop.env
+
+  druid-pg:
+    container_name: druid-pg
+    image: postgres:15.1
+    volumes:
+      - metadata_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=MyDruidSecretPass
+      - POSTGRES_USER=druid
+      - POSTGRES_DB=druid
+
+  coordinator:
+    image: druid-hdfs:24.0.1
+    hostname: coordinator
+    depends_on:
+      - druid-pg
+      - zookeeper
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./druid/common_env_config
+    environment:
+      - DRUID_SERVICE=coordinator
+      - DRUID_JVM_ARGS=-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager
+
+  broker:
+    image: druid-hdfs:24.0.1
+    hostname: broker
+    depends_on:
+      - druid-pg
+      - zookeeper
+      - coordinator
+    ports:
+      - "8082:8082"
+    env_file:
+      - ./druid/common_env_config
+    environment:
+      - DRUID_SERVICE=broker
+      - DRUID_JVM_ARGS=-server -Xms128m -Xmx128m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:MaxDirectMemorySize=1g -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Dcom.sun.management.jmxremote.port=17071 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+
+  historical:
+    image: druid-hdfs:24.0.1
+    hostname: historical
+    ports:
+      - "8083:8083"
+    depends_on:
+      - druid-pg
+      - zookeeper
+      - coordinator
+    env_file:
+      - ./druid/common_env_config
+    environment:
+      - DRUID_SERVICE=historical
+      - DRUID_JVM_ARGS=-server -Xms256m -Xmx256m -XX:MaxDirectMemorySize=1g -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps
+
+  overlord:
+    image: druid-hdfs:24.0.1
+    hostname: overlord
+    ports:
+      - "8090:8090"
+    depends_on:
+      - druid-pg
+      - zookeeper
+      - coordinator
+    env_file:
+      - ./druid/common_env_config
+    environment:
+      - DRUID_SERVICE=overlord
+      - DRUID_JVM_ARGS=-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager
+
+  middlemanager:
+    image: druid-hdfs:24.0.1
+    hostname: middlemanager
+    ports:
+      - "8091:8091"
+    depends_on:
+      - druid-pg
+      - zookeeper
+      - coordinator
+    env_file:
+      - ./druid/common_env_config
+    environment:
+      - DRUID_SERVICE=middleManager
+      - DRUID_JVM_ARGS=-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager
+
+  router:
+    image: druid-hdfs:24.0.1
+    hostname: router
+    ports:
+      - "8888:8888"
+    depends_on:
+      - druid-pg
+      - zookeeper
+      - coordinator
+      - broker
+    env_file:
+      - ./druid/common_env_config
+    environment:
+      - DRUID_SERVICE=router
+      - DRUID_JVM_ARGS=-server -Xms512m -Xmx512m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager
+
+
+volumes:
+  hadoop_namenode:
+    driver: local
+  hadoop_datanode_1:
+    driver: local
+  hadoop_datanode_2:
+    driver: local
+  hadoop_datanode_3:
+    driver: local
+  metadata_data: {}

@@ -1,0 +1,19 @@
+ZOOKEEPER_SERVER=zookeeper
+
+LOG_LEVEL=ERROR
+
+METADATA_STORAGE_HOST=druid-pg
+METADATA_STORAGE_PORT=5432
+METADATA_STORAGE_USER=druid
+METADATA_STORAGE_PASSWORD=MyDruidSecretPass
+
+DEEP_STORAGE_HOST=namenode
+DEEP_STORAGE_PORT=9000
+
+# use ; as a separator
+# DRUID_PULL_EXTENSION=org.apache.druid.extensions:mysql-metadata-storage;org.apache.druid.extensions:druid-datasketches;org.apache.druid.extensions:druid-parquet-extensions
+
+#DRUID_PULL_EXTENSION=org.apache.druid.extensions:postgresql-metadata-storage
+
+#HADOOP_VERSION=2.9.2
+#DRUID_HADOOP_EXTENIONS=org.apache.hadoop:hadoop-aws
