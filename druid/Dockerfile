@@ -5,7 +5,7 @@ ENV DRUID_VERSION ${DRUID_VERSION}
 ENV LOG_LEVEL info
 
 RUN apt-get update \
-      && apt-get install -y curl
+      && apt-get install -y curl gettext-base
 
 # Install druid
 RUN curl https://archive.apache.org/dist/druid/${DRUID_VERSION}/apache-druid-${DRUID_VERSION}-bin.tar.gz > /opt/druid-${DRUID_VERSION}-bin.tar.gz \

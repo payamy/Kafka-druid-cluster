@@ -1,0 +1,44 @@
+{
+  "type": "kafka",
+  "spec": {
+    "ioConfig": {
+      "type": "kafka",
+      "consumerProperties": {
+        "bootstrap.servers": "kafka-0:9092,kafka-1:9094"
+      },
+      "topic": "sample-topic",
+      "inputFormat": {
+        "type": "json"
+      },
+      "useEarliestOffset": true,
+      "appendToExisting": true
+    },
+    "tuningConfig": {
+      "type": "kafka",
+      "partitionsSpec": {
+        "type": "dynamic"
+      }
+    },
+    "dataSchema": {
+      "dataSource": "sample-topic",
+      "timestampSpec": {
+        "column": "datetime",
+        "format": "auto"
+      },
+      "dimensionsSpec": {
+        "dimensions": [
+          "id",
+          {
+            "type": "long",
+            "name": "value"
+          }
+        ]
+      },
+      "granularitySpec": {
+        "queryGranularity": "none",
+        "rollup": false,
+        "segmentGranularity": "month"
+      }
+    }
+  }
+}

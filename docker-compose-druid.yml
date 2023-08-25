@@ -41,7 +41,6 @@ services:
       - ./hdfs_conf/hadoop.env
 
   druid-pg:
-    container_name: druid-pg
     image: postgres:15.1
     volumes:
       - metadata_data:/var/lib/postgresql/data
@@ -49,6 +48,8 @@ services:
       - POSTGRES_PASSWORD=MyDruidSecretPass
       - POSTGRES_USER=druid
       - POSTGRES_DB=druid
+    ports:
+      - "5432:5432"
 
   coordinator:
     image: druid-hdfs:24.0.1
