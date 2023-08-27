@@ -28,10 +28,10 @@ def load_data():
 
 
 with DAG(
-    dag_id="stream_data",
-    description="Stream Data from Kafka Topic to Apache Druid Datasource",
+    dag_id="batch_job",
+    description="Apache Druid Multi-Stage Query Batch Job",
     default_args=default_args,
-    schedule_interval="@once",
+    schedule_interval="@daily",
 ) as dag:
 
     task1 = PythonOperator(
