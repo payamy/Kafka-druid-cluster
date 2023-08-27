@@ -1,0 +1,6 @@
+{
+  "query": "REPLACE INTO sample-batch OVERWRITE ALL SELECT TIME_FLOOR(__time, 'PT1H') AS __time, id, SUM(\"value\") AS sum_value FROM \"sample-topic\" GROUP BY 1, 2 PARTITIONED BY HOUR CLUSTERED BY id",
+  "context": {
+    "maxNumTasks": 2
+  }
+}

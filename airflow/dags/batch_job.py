@@ -1,43 +1,30 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.exceptions import AirflowException
 from datetime import datetime, timedelta
 
 from ds import DruidDatasource
 
 from requests.auth import HTTPBasicAuth
 import requests
-import json
-import time
 
+start_date = datetime.today()
 
 default_args = {
     'owner': 'Payam',
-    'start_date': datetime(2023, 1, 1),
+    'start_date': datetime(start_date.year, start_date.month, start_date.day, 2, 30, 0),
     'retries': 5,
     'retry_delay': timedelta(minutes=2),
 }
 
 
 def load_data():
-    conf = DruidDatasource.load_json_stream_data()
+    conf = DruidDatasource.load_json_batch_job()
     auth = HTTPBasicAuth('admin', 'druidAdminPassword')
-    res = requests.post(
-        url='http://router:8888/druid/indexer/v1/supervisor',
+    requests.post(
+        url='http://router:8888/druid/v2/sql/task',
         json=conf,
         auth=auth,
     )
-    time.sleep(60)
-    supervisor_id = json.loads(res._content)['id']
-    res_2 = requests.get(
-        url=f'http://router:8888/druid/indexer/v1/supervisor/{supervisor_id}/status',
-        auth=auth,
-    )
-    healthy = str(json.loads(res_2._content)['payload']["state"])
-    if healthy == "RUNNING":
-        print('Data loaded to Druid datasource')
-    else:
-        raise AirflowException('Submitting supervisor was unsuccessful')
 
 
 with DAG(
