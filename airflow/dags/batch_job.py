@@ -7,7 +7,7 @@ from ds import DruidDatasource
 from requests.auth import HTTPBasicAuth
 import requests
 
-start_date = datetime.today()
+start_date = datetime.today() - timedelta(days=1)
 
 default_args = {
     'owner': 'Payam',
