@@ -116,3 +116,9 @@ venv.bak/
 
 # Airflow logs
 airflow/logs
+
+# Airflow env file
+airflow_env.env
+
+# Docker Compose stack file
+docker-compose.stack.yml

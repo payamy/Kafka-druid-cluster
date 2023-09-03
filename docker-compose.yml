@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   kafka-producer:
-    image: kafka-python-producer:0.0.1
+    image: payamyprojects.com/kafka-python-producer:0.0.1
     volumes:
       - "./producer/main.py:/main.py"
     command: >
@@ -16,6 +16,10 @@ services:
       - "zookeeper_data:/bitnami"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    deploy:
+      placement: 
+        constraints: 
+          - node.role == manager
 
   kafka-0:
     image: docker.io/bitnami/kafka:3.1
@@ -32,8 +36,12 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-0:9092,EXTERNAL://localhost:9093
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_BROKER_ID=0
-    depends_on:
-      - zookeeper
+    # depends_on:
+    #   - zookeeper
+    deploy:
+      placement: 
+        constraints: 
+          - node.role == manager
 
   kafka-1:
     image: docker.io/bitnami/kafka:3.1
@@ -50,8 +58,12 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9094,EXTERNAL://localhost:9095
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_BROKER_ID=1
-    depends_on:
-      - zookeeper
+    # depends_on:
+    #   - zookeeper
+    deploy:
+      placement: 
+        constraints: 
+          - node.role == worker
 
 
 volumes:

@@ -20,11 +20,12 @@ default_args = {
 def load_data():
     conf = DruidDatasource.load_json_batch_job()
     auth = HTTPBasicAuth('admin', 'druidAdminPassword')
-    requests.post(
+    res = requests.post(
         url='http://router:8888/druid/v2/sql/task',
         json=conf,
         auth=auth,
     )
+    print(res._content)
 
 
 with DAG(
