@@ -40,5 +40,5 @@ if __name__ == '__main__':
         random_number = random.randint(1, 100)
         data = {'id': random_letter, 'datetime': str(datetime.datetime.now()), 'value': random_number}
         producer.produce(TOPIC_NAME, dumps(data).encode('utf-8'), partition=random.randint(0, 3))
-        sleep(random.random()/100)
+        sleep(random.random()/10)
         producer.flush()
