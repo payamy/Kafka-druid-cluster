@@ -14,3 +14,5 @@ Also, Apache Airflow is used to automate Druid data ingestion. Airflow has two d
 Note #1: Due to resource limitations, the second dag is disabled.
 
 Note #2: You can check if everything works fine using Druid Web UI (Username: admin, Password: druidAdminPassword)
+
+Note #3: You can access Druid web UI using this url: http://45.159.149.181:8888
